@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/ruby:2.5.3
+      environment:
+        TERRAFORM_VERSION: v0.11.10
+    steps:
+    - checkout
+    - restore_cache:
+        key: v1-dependency-cache-{{ .Branch }}
+    - run:
+        command: |
+          mkdir -p $HOME/.terraform
+          if [ -z "$(ls -A $HOME/.terraform/terraform_${TERRAFORM_VERSION}_linux_amd64.zip)"]: then
+             cd $HOME/.terraform
+             curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terrform_${TERRAFORM_VERSION}_linux_amd64.zip
+             unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+          fi
+    - run:
+        command: sudo cp -fR ~/.terraform/* /usr/local/bin
