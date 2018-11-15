@@ -3,12 +3,35 @@ provider "aws" {
   secret_key = "${var.secret_key}"
   region     = "${var.region}"
 }
+data "aws_ami" "centos" {
+  owners      = ["679593333241"]
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["CentOS Linux 7 x86_64 HVM EBS *"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
 
 resource "aws_instance" "example" {
-  ami           = "ami-0f65671a86f061fcd"
+  ami           = "${data.aws_ami.centos.id}"
   instance_type = "t2.micro"
   key_name = "infra-ci-cookbooks"
   vpc_security_group_ids = ["${aws_security_group.test.id}"]
+  tags { Name = "webapp" }
+  provisioner "local-exec" {
+     command = "echo ${aws_instance.example.public_ip} ${aws_instance.example.public_dns} >> hosts.txt"
+  }
 }
 
 resource "aws_eip" "ip" {
