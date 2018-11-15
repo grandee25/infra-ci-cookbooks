@@ -10,8 +10,9 @@ jobs:
     - restore_cache:
         key: v1-dependency-cache-{{ .Branch }}
     - run:
-        command: |
-          mkdir -p $HOME/.terraform
+        command: mkdir -p $HOME/.terraform
+    - run:
+        command:
           if [ -z "$(ls -A $HOME/.terraform/terraform_${TERRAFORM_VERSION}_linux_amd64.zip)"]: then
              cd $HOME/.terraform
              curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terrform_${TERRAFORM_VERSION}_linux_amd64.zip
